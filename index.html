@@ -1,0 +1,1106 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>小黑盒数据面板</title>
+<style>
+:root{
+  --paper:#f5f2ea;
+  --card:#ffffff;
+  --ink:#131c19;
+  --ink2:#3f4c47;
+  --ink3:#7d8884;
+  --line:rgba(19,28,25,.08);
+  --line2:rgba(19,28,25,.14);
+  --brand:#0d6b58;
+  --brand2:#1aa384;
+  --coral:#ff7a45;
+  --gold:#c9821b;
+  --blue:#2f6fb2;
+  --purple:#6e5aa0;
+  --radius:18px;
+  --shadow:0 1px 2px rgba(19,28,25,.04),0 10px 30px -12px rgba(19,28,25,.12);
+  --shadow-lg:0 2px 4px rgba(19,28,25,.04),0 24px 56px -20px rgba(19,28,25,.22);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);
+  font:14px/1.65 "Inter","PingFang SC","Microsoft YaHei",-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1200px 600px at 12% -10%,rgba(26,163,132,.10),transparent 60%),
+    radial-gradient(900px 500px at 100% 0%,rgba(255,122,69,.08),transparent 55%),
+    var(--paper);
+  background-attachment:fixed;
+}
+::selection{background:rgba(26,163,132,.22)}
+.wrap{max-width:1240px;margin:0 auto;padding:26px 22px 80px}
+header{
+  position:sticky;top:0;z-index:20;display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;
+  padding:18px 22px 14px;margin:-26px -22px 8px;
+  background:rgba(245,242,234,.72);backdrop-filter:blur(14px) saturate(1.2);
+  border-bottom:1px solid var(--line);
+}
+h1{
+  font-size:24px;margin:0;letter-spacing:-.4px;font-weight:800;
+  background:linear-gradient(120deg,var(--ink) 20%,var(--brand) 55%,var(--brand2));
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.sub{color:var(--ink3);font-size:12px;margin-top:3px}
+.grow{flex:1}
+button{
+  font:13px/1 inherit;padding:10px 15px;border-radius:11px;border:1px solid var(--line);
+  background:var(--card);color:var(--ink);cursor:pointer;
+  box-shadow:0 1px 2px rgba(19,28,25,.04);transition:transform .16s ease,box-shadow .16s ease,border-color .16s,color .16s;
+}
+button:hover{border-color:var(--brand2);color:var(--brand);transform:translateY(-1px);box-shadow:0 6px 18px -8px rgba(13,107,88,.35)}
+button:active{transform:translateY(0) scale(.99)}
+button.primary{
+  background:linear-gradient(135deg,#0d6b58,#16a085);border-color:transparent;color:#fff;
+  box-shadow:0 8px 22px -10px rgba(13,107,88,.7);
+}
+button.primary:hover{filter:brightness(1.06);color:#fff;box-shadow:0 12px 30px -10px rgba(13,107,88,.75)}
+button:disabled{opacity:.45;cursor:default;transform:none;box-shadow:none}
+.tabs{
+  display:flex;gap:4px;margin:18px 0 22px;padding:5px;flex-wrap:wrap;
+  background:rgba(255,255,255,.6);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);backdrop-filter:blur(6px);width:max-content;max-width:100%;
+}
+.tab{padding:9px 16px;border-radius:10px;border:0;cursor:pointer;color:var(--ink2);font-size:13px;background:transparent;transition:.18s}
+.tab:hover{color:var(--ink)}
+.tab[aria-selected="true"]{
+  background:linear-gradient(135deg,#0d6b58,#16a085);color:#fff;
+  box-shadow:0 8px 18px -10px rgba(13,107,88,.8);
+}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--card);box-shadow:0 1px 2px rgba(19,28,25,.03)}
+.seg button{border:0;border-radius:0;padding:8px 13px;font-size:12px;color:var(--ink2);box-shadow:none}
+.seg button[aria-pressed="true"]{background:linear-gradient(135deg,#0d6b58,#16a085);color:#fff}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:12px;margin-bottom:24px}
+.card{
+  position:relative;overflow:hidden;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);padding:15px 16px;box-shadow:var(--shadow);
+  transition:transform .2s ease,box-shadow .2s ease,border-color .2s;
+}
+.card::before{
+  content:"";position:absolute;inset:0 0 auto;height:3px;
+  background:linear-gradient(90deg,#0d6b58,#1aa384 45%,#ffb27a);
+  opacity:.85;
+}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:var(--line2)}
+.card b{display:block;font-size:24px;font-variant-numeric:tabular-nums;letter-spacing:-.6px;line-height:1.25}
+.card span{color:var(--ink3);font-size:12px}
+.card i{font-style:normal;font-size:12px;color:var(--brand);margin-left:6px}
+h2{font-size:14px;margin:30px 0 12px;color:var(--ink2);font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
+h2::before{content:"";width:6px;height:6px;border-radius:2px;background:linear-gradient(135deg,#0d6b58,#1aa384);display:inline-block}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px 20px;box-shadow:var(--shadow)}
+.chart svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--ink3);margin-bottom:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;font-size:13px}
+th{background:rgba(245,242,234,.8);cursor:pointer;white-space:nowrap;color:var(--ink2);font-weight:700;font-size:12px;position:sticky;top:0;backdrop-filter:blur(4px)}
+th:hover{color:var(--brand)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+td.title{max-width:380px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+td.title:hover{color:var(--brand)}
+tr:hover td{background:rgba(26,163,132,.05)}
+tr.active td{background:rgba(26,163,132,.09)}
+tr.off td{opacity:.45}
+input.inc{width:14px;height:14px;accent-color:#16a085;cursor:pointer;margin:0}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;background:rgba(26,163,132,.1);color:var(--brand);margin-left:6px}
+.pill.warn{background:rgba(201,130,27,.12);color:var(--gold)}
+.pill.danger{background:rgba(192,57,43,.1);color:#c0392b}
+.list{display:grid;gap:9px}
+.item{
+  display:flex;gap:12px;align-items:center;padding:11px 14px;border:1px solid var(--line);
+  border-radius:14px;background:var(--card);transition:.18s;
+}
+.item:hover{border-color:var(--line2);box-shadow:0 10px 24px -18px rgba(19,28,25,.4);transform:translateY(-1px)}
+.item .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .m{color:var(--ink3);font-size:12px;white-space:nowrap}
+.hint{color:var(--ink3);font-size:12px;margin-top:8px}
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translate(-50%,12px);
+  background:rgba(19,28,25,.92);color:#fff;padding:10px 18px;border-radius:12px;font-size:13px;
+  opacity:0;transition:.22s ease;pointer-events:none;z-index:99;box-shadow:0 16px 40px -16px rgba(0,0,0,.5);
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+#tip{position:fixed;pointer-events:none;background:rgba(19,28,25,.94);color:#fff;padding:7px 11px;border-radius:9px;font-size:12px;opacity:0;transition:opacity .12s;z-index:50;max-width:280px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5)}
+#tip.show{opacity:1}
+.goal{margin:12px 0}
+.goal .bar{height:12px;background:rgba(19,28,25,.07);border-radius:999px;overflow:hidden;margin-top:7px}
+.goal .bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#0d6b58,#22b394);transition:width .6s cubic-bezier(.2,.7,.2,1);position:relative}
+.goal .bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent);animation:shimmer 2.6s infinite}
+@keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.goal .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--ink3)}
+.heat{display:grid;grid-template-columns:repeat(auto-fill,18px);gap:3px}
+.heat i{width:18px;height:18px;border-radius:3px;background:rgba(19,28,25,.06);transition:transform .12s}
+.heat i:hover{transform:scale(1.25)}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.vs .box{background:linear-gradient(180deg,rgba(26,163,132,.06),transparent);border:1px solid var(--line);border-radius:14px;padding:13px 15px}
+.vs b{font-size:20px}
+.avgmark{position:absolute;top:-3px;width:2px;height:16px;background:#9a8f80;border-radius:2px}
+.track{position:relative}
+.cmpnum b.up{color:#0f8a6f}
+.cmpnum b.down{color:#b4553f}
+#cmpBox{margin-top:12px}
+#cmpBox table{font-size:12px}
+.empty{padding:48px 20px;text-align:center;color:var(--ink3)}
+label.f{display:block;font-size:12px;color:var(--ink3);margin:14px 0 6px}
+input[type=text],input[type=password],input[type=number],select{
+  width:100%;max-width:420px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;
+  font:13px/1.4 inherit;background:var(--card);transition:.16s;box-shadow:0 1px 2px rgba(19,28,25,.03)
+}
+input:focus,select:focus{outline:none;border-color:var(--brand2);box-shadow:0 0 0 3px rgba(26,163,132,.15)}
+.row2{display:flex;gap:24px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:120px 1fr;gap:6px 14px;font-size:13px}
+.kv span:first-child{color:var(--ink3)}
+.bars{display:grid;gap:9px}
+.barline{display:grid;grid-template-columns:96px 1fr 152px;gap:10px;align-items:center;font-size:12px}
+.cmpnum{font-size:11.5px;color:#7a8783;white-space:nowrap}
+.track{height:10px;background:rgba(19,28,25,.07);border-radius:999px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:999px}
+@media(max-width:720px){
+  .cards{grid-template-columns:repeat(2,1fr)}
+  header{margin:-26px -22px 8px;padding:14px 16px}
+  .wrap{padding:18px 16px 70px}
+  .barline{grid-template-columns:72px 1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* motion */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cards .card,.panel,.item,table,.vs .box{animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+.cards .card:nth-child(2){animation-delay:.04s}
+.cards .card:nth-child(3){animation-delay:.08s}
+.cards .card:nth-child(4){animation-delay:.12s}
+.cards .card:nth-child(5){animation-delay:.16s}
+.cards .card:nth-child(6){animation-delay:.2s}
+.cards .card:nth-child(7){animation-delay:.24s}
+
+/* ---- aurora / spotlight / motion ---- */
+.aurora{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-1}
+.aurora i{position:absolute;display:block;border-radius:50%;filter:blur(70px);opacity:.5;mix-blend-mode:multiply}
+.aurora i:nth-child(1){width:620px;height:620px;left:-160px;top:-220px;background:radial-gradient(circle,#9be6cf,transparent 65%);animation:float1 18s ease-in-out infinite}
+.aurora i:nth-child(2){width:520px;height:520px;right:-140px;top:-120px;background:radial-gradient(circle,#ffd2b8,transparent 65%);animation:float2 22s ease-in-out infinite}
+.aurora i:nth-child(3){width:560px;height:560px;left:38%;bottom:-280px;background:radial-gradient(circle,#cfe0ff,transparent 65%);animation:float1 26s ease-in-out infinite reverse}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,30px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(-50px,40px)}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.cards .card{animation:rise .5s both}
+.cards .card:nth-child(2){animation-delay:.05s}
+.cards .card:nth-child(3){animation-delay:.1s}
+.cards .card:nth-child(4){animation-delay:.15s}
+.cards .card:nth-child(5){animation-delay:.2s}
+.cards .card:nth-child(6){animation-delay:.25s}
+.cards .card:nth-child(7){animation-delay:.3s}
+[id^="view-"]{animation:rise .38s both}
+.card::after,.panel::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .28s;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,0%),rgba(26,163,132,.13),transparent 62%)}
+.card:hover::after,.panel:hover::after{opacity:1}
+.panel{position:relative;overflow:hidden}
+button.primary{position:relative;overflow:hidden}
+button.primary::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;transform:skewX(-20deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}
+button.primary:hover::after{animation:sweep .8s ease}
+@keyframes sweep{from{left:-60%}to{left:120%}}
+
+.cards .card{animation:none!important}
+[id^="view-"]{animation:none!important}
+</style>
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>小黑盒数据面板</h1>
+      <div class="sub" id="meta">正在读取…</div>
+  <div class="hint" id="cmp"></div>
+    </div>
+    <div class="grow"></div>
+    <div class="seg" id="range">
+      <button data-d="7">近 7 天</button>
+      <button data-d="30">近 30 天</button>
+      <button data-d="90">近 90 天</button>
+      <button data-d="0" aria-pressed="true">全部</button>
+    </div>
+    <button class="primary" id="btnScrape">重新抓取</button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <div class="tab" role="tab" data-v="overview" aria-selected="true">总览</div>
+    <div class="tab" role="tab" data-v="charts">图表</div>
+    <div class="tab" role="tab" data-v="content">内容</div>
+    <div class="tab" role="tab" data-v="post">单篇</div>
+    <div class="tab" role="tab" data-v="settings">设置</div>
+  </nav>
+
+  <section id="view-overview">
+    <div class="cards" id="cards"></div>
+    <div class="row2" style="margin-top:18px">
+      <div class="panel"><h2 style="margin-top:0">本月目标</h2><div id="goals"></div></div>
+      <div class="panel"><h2 style="margin-top:0">历史最好 vs 最近 10 篇</h2><div id="vsBest" class="vs"></div></div>
+    </div>
+    <h2>最近发布</h2>
+    <div class="list" id="recent"></div>
+    <h2>需要改的</h2>
+    <div class="list" id="todo"></div>
+  </section>
+
+  <section id="view-charts" hidden>
+    <h2>每日浏览量（全部文章合计，每个点是一次抓取）</h2>
+    <div class="panel chart" id="chartDaily"></div>
+    <h2>每月：发了几篇，拿了多少浏览</h2>
+    <div class="panel chart" id="chartMonth"></div>
+    <h2>真实得分前 12</h2>
+    <div class="panel chart" id="chartScore"></div>
+    <h2>曝光 → 浏览转化率（前 10 / 后 10）</h2>
+    <div class="panel chart" id="chartCtr"></div>
+    <h2>浏览 vs 点赞率（每个点是一篇）</h2>
+    <div class="panel chart" id="chartScatter"></div>
+    <h2>发布热力图（最近 20 周，越深发得越多）</h2>
+    <div class="panel"><div class="heat" id="heatmap"></div><div class="hint" id="heatHint" style="margin-top:8px"></div></div>
+  </section>
+
+  <section id="view-content" hidden>
+    <h2>高曝光低点击 <span class="pill warn">封面/标题问题</span></h2>
+    <div class="list" id="listLowCtr"></div>
+    <h2>高浏览低互动 <span class="pill">缺讨论点或实用价值</span></h2>
+    <div class="list" id="listLowEngage"></div>
+    <h2 style="margin-top:26px">全部内容 <span class="hint" id="tblHint"></span></h2>
+    <table id="table">
+      <thead><tr>
+        <th title="不勾选就不计入统计">计入</th>
+        <th data-k="title">标题</th>
+        <th data-k="date" class="num">日期</th>
+        <th data-k="views" class="num">浏览</th>
+        <th data-k="likes" class="num">赞</th>
+        <th data-k="comments" class="num">评论</th>
+        <th data-k="favorites" class="num">收藏</th>
+        <th data-k="shares" class="num">分享</th>
+        <th data-k="battery" class="num">充电</th>
+        <th data-k="exposure" class="num">曝光</th>
+        <th data-k="score" class="num">真实得分</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="view-post" hidden>
+    <div id="postDetail"><div class="empty">在「内容」里点一篇文章看细节</div></div>
+  </section>
+
+  <section id="view-settings" hidden>
+    <div class="panel" style="max-width:720px">
+      <h2 style="margin-top:0">生成分析用的模型</h2>
+      <label class="f">DeepSeek API Key（只存在本机 config.json）</label>
+      <input type="password" id="apiKey" placeholder="留空表示不调用模型，只生成提示词">
+      <label class="f">模型</label>
+      <select id="model">
+        <option value="deepseek-flash">deepseek-flash（V4.1 Flash）</option>
+        <option value="deepseek-v4-pro">deepseek-v4-pro</option>
+      </select>
+      <h2>定时抓取</h2>
+      <label class="f"><input type="checkbox" id="autoScrape"> 后台自动抓取（不占前台，跑在无头 Edge 里）</label>
+      <label class="f">每天几点抓（0–23）</label>
+      <input type="number" id="dailyHour" min="0" max="23" step="1" value="18">
+      <div class="hint">每天到点抓一次；电脑关机/服务没开时，开机或启动后会补一次。</div>
+      <h2>月度目标</h2>
+      <div class="row2">
+        <div><label class="f">每月篇数</label><input type="number" id="goalPosts" min="1" value="20"></div>
+        <div><label class="f">每月浏览</label><input type="number" id="goalViews" min="1000" step="1000" value="50000"></div>
+      </div>
+      <div class="row2">
+        <div><label class="f">单篇浏览目标</label><input type="number" id="goalPerViews" min="1" step="100" value="1000"></div>
+        <div><label class="f">单篇互动率目标（%）</label><input type="number" id="goalPerRate" min="0" step="0.5" value="3"></div>
+      </div>
+      <div class="row2">
+        <div><label class="f">本月要达到的单篇数</label><input type="number" id="goalPerCount" min="1" value="4"></div>
+        <div></div>
+      </div>
+      <div class="hint">「本月要达到的单篇数」指各项单篇目标每月至少有几篇达标；分母用它，不是本月已发篇数。</div>
+      <div class="hint">目标只用来在总览画进度条，不影响统计。</div>
+      <div class="hint">定时抓取会更新 data.json，并按天存一份 history.json（用于趋势）。电脑关机期间不会跑，开机后如果超过间隔会自动补一次。</div>
+      <div style="margin-top:18px"><button class="primary" id="btnSave">保存设置</button> <span class="hint" id="saveHint"></span></div>
+    </div>
+    <div class="panel" style="max-width:720px;margin-top:16px">
+      <h2 style="margin-top:0">分析</h2>
+      <div class="row2">
+        <button id="btnAnalyze">生成分析报告</button>
+        <button id="btnPrompt">只看提示词</button>
+      </div>
+      <pre id="out" style="white-space:pre-wrap;max-height:420px;overflow:auto;margin-top:14px;display:none"></pre>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast"></div>
+<div id="tip"></div>
+
+<script>
+const $ = s => document.querySelector(s)
+const $$ = s => [...document.querySelectorAll(s)]
+const fmt = n => (Number(n) || 0).toLocaleString('zh-CN')
+const state = { rows: [], days: 0, view: 'overview', sortKey: 'views', sortDir: -1, selected: null, settings: null, running: false, exclude: new Set() }
+
+function toast(msg) { const el = $('#toast'); el.textContent = msg; el.classList.add('show'); clearTimeout(el.__t); el.__t = setTimeout(() => el.classList.remove('show'), 3200) }
+
+const rate = (r, k) => (Number(r.views) > 0 ? (Number(r[k]) || 0) / Number(r.views) * 100 : 0)
+const ctr = r => (Number(r.exposure) > 0 ? Number(r.views) / Number(r.exposure) * 100 : 0)
+
+function inRange(r) {
+  if (!state.days) return true
+  const cut = Date.now() - state.days * 86400e3
+  return new Date(r.date + 'T23:59:59').getTime() >= cut
+}
+
+function filtered() {
+  return state.rows.filter(r => inRange(r) && !state.exclude.has(Number(r.id)))
+}
+
+function pctRank(v, arr) {
+  if (arr.length < 2) return 0.5
+  const s = [...arr].sort((a, b) => a - b)
+  let i = s.findIndex(x => x >= v)
+  if (i < 0) i = s.length - 1
+  return i / (s.length - 1)
+}
+
+function realScore(r, all) {
+  const pViews = pctRank(Number(r.views) || 0, all.map(x => Number(x.views) || 0))
+  const pLike = pctRank(rate(r, 'likes'), all.map(x => rate(x, 'likes')))
+  const pFav = pctRank(rate(r, 'favorites'), all.map(x => rate(x, 'favorites')))
+  const pCom = pctRank(rate(r, 'comments'), all.map(x => rate(x, 'comments')))
+  const pBat = pctRank(rate(r, 'battery'), all.map(x => rate(x, 'battery')))
+  const score = Math.round(100 * (0.45 * pViews + 0.2 * pLike + 0.15 * pFav + 0.1 * pCom + 0.1 * pBat))
+  return { score, parts: { pViews, pLike, pFav, pCom, pBat } }
+}
+
+function scored() {
+  const all = filtered()
+  return all.map(r => ({ ...r, real: realScore(r, all) }))
+}
+
+function renderCards() {
+  const all = filtered()
+  const sum = k => all.reduce((a, r) => a + (Number(r[k]) || 0), 0)
+  const items = [
+    ['篇数', all.length],
+    ['总浏览', sum('views')],
+    ['总点赞', sum('likes')],
+    ['总评论', sum('comments')],
+    ['总收藏', sum('favorites')],
+    ['总分享', sum('shares')],
+    ['总充电', sum('battery')],
+  ]
+  $('#cards').innerHTML = items.map(([k, v]) => `<div class="card"><b>${fmt(v)}</b><span>${k}</span></div>`).join('')
+  // 数字直接落定，避免重绘时闪动
+}
+
+function renderRecent() {
+  const all = [...filtered()].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6)
+  $('#recent').innerHTML = all.length ? all.map(r => `
+    <div class="item" data-id="${r.id}">
+      <div class="t">${r.title}</div>
+      <div class="m">${r.date} · ${fmt(r.views)} 浏览 · ${fmt(r.likes)} 赞</div>
+    </div>`).join('') : '<div class="empty">没有数据</div>'
+  $$('#recent .item').forEach(el => el.onclick = () => openPost(Number(el.dataset.id)))
+}
+
+function renderTodo() {
+  const all = scored()
+  const medExp = median(all.map(r => Number(r.exposure) || 0))
+  const lowCtr = all.filter(r => Number(r.exposure) > 0 && Number(r.exposure) >= medExp && ctr(r) < 15).slice(0, 4)
+  const p75 = quantile(all.map(r => Number(r.views) || 0), 0.75)
+  const lowEng = all.filter(r => Number(r.views) >= p75 && (rate(r, 'likes') + rate(r, 'favorites') + rate(r, 'comments')) < 3).slice(0, 4)
+  const box = (list, kind) => list.length ? list.map(r => `
+    <div class="item" data-id="${r.id}">
+      <div class="t">${r.title}</div>
+      <div class="m">${kind === 'ctr' ? '点击率 ' + ctr(r).toFixed(1) + '%' : '互动率 ' + (rate(r, 'likes') + rate(r, 'favorites') + rate(r, 'comments')).toFixed(1) + '%'}</div>
+    </div>`).join('') : '<div class="empty">这一类暂时没有</div>'
+  $('#todo').innerHTML = `<div class="hint" style="margin-bottom:8px">高曝光但点击率低于 15%</div>${box(lowCtr, 'ctr')}
+    <div class="hint" style="margin:12px 0 8px">浏览在前 25%，但互动率低于 3%</div>${box(lowEng, 'eng')}`
+  $$('#todo .item').forEach(el => el.onclick = () => openPost(Number(el.dataset.id)))
+}
+
+const median = a => quantile(a, 0.5)
+function quantile(arr, q) {
+  if (!arr.length) return 0
+  const s = [...arr].sort((a, b) => a - b)
+  return s[Math.min(s.length - 1, Math.floor(q * (s.length - 1)))]
+}
+
+function svg(w, h, inner) { return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">${inner}</svg>` }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
+function drawMonth() {
+  const all = filtered()
+  const map = new Map()
+  for (const r of all) {
+    const m = (r.date || '').slice(0, 7) || '未知'
+    if (!map.has(m)) map.set(m, { n: 0, views: 0 })
+    const v = map.get(m); v.n++; v.views += Number(r.views) || 0
+  }
+  const ms = [...map.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  if (!ms.length) { $('#chartMonth').innerHTML = '<div class="empty">没有数据</div>'; return }
+  const W = 980, H = 300, L = 56, B = 54, T = 26
+  const maxV = Math.max(1, ...ms.map(([, v]) => v.views))
+  const maxN = Math.max(1, ...ms.map(([, v]) => v.n))
+  const bw = (W - L - 20) / ms.length
+  let grid = ''
+  for (let i = 0; i <= 4; i++) {
+    const y = T + (H - T - B) * i / 4
+    const val = Math.round(maxV * (1 - i / 4))
+    grid += `<line x1="${L}" y1="${y}" x2="${W - 10}" y2="${y}" stroke="rgba(22,33,30,.08)"/>
+      <text x="${L - 8}" y="${y + 4}" font-size="11" fill="#7a8783" text-anchor="end">${val >= 10000 ? (val / 10000).toFixed(1) + 'w' : val}</text>`
+  }
+  let bars = '', pts = []
+  ms.forEach(([m, v], i) => {
+    const x = L + i * bw
+    const h = (v.views / maxV) * (H - T - B)
+    const y = H - B - h
+    bars += `<rect x="${x + bw * 0.22}" y="${y}" width="${bw * 0.3}" height="${h}" rx="5" fill="url(#g1)"><title>${m}：${fmt(v.views)} 浏览 / ${v.n} 篇</title></rect>`
+    bars += `<text x="${x + bw * 0.37}" y="${y - 7}" font-size="11" fill="#3c4a46" text-anchor="middle">${v.views >= 10000 ? (v.views / 10000).toFixed(1) + 'w' : v.views}</text>`
+    bars += `<text x="${x + bw * 0.37}" y="${H - B + 18}" font-size="12" fill="#3c4a46" text-anchor="middle">${m.slice(2)}</text>`
+    bars += `<text x="${x + bw * 0.37}" y="${H - B + 33}" font-size="10" fill="#9aa6a2" text-anchor="middle">${v.n} 篇</text>`
+    pts.push([x + bw * 0.37, H - B - (v.n / maxN) * (H - T - B) * 0.9])
+  })
+  const path = pts.map((p, i) => (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' ')
+  const line = `<path d="${path}" fill="none" stroke="#c9821b" stroke-width="2" stroke-linejoin="round"/>
+    ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="3.5" fill="#fff" stroke="#c9821b" stroke-width="2"/>`).join('')}`
+  $('#chartMonth').innerHTML = `<div class="legend"><span><i style="background:#1a9c80"></i>浏览（柱）</span><span><i style="background:#c9821b;border-radius:50%"></i>篇数（折线）</span></div>` +
+    svg(W, H, `<defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2bbfa0"/><stop offset="1" stop-color="#17856d"/></linearGradient></defs>${grid}${bars}${line}`)
+}
+
+function drawScore() {
+  const all = scored().sort((a, b) => b.real.score - a.real.score).slice(0, 12)
+  if (!all.length) { $('#chartScore').innerHTML = '<div class="empty">没有数据</div>'; return }
+  const W = 980, rowH = 30, H = all.length * rowH + 10
+  let s = ''
+  all.forEach((r, i) => {
+    const y = 6 + i * rowH
+    const w = Math.max(3, (r.real.score / 100) * 640)
+    const color = r.real.score >= 70 ? '#17856d' : r.real.score >= 45 ? '#2f6fb2' : '#c9821b'
+    s += `<text x="0" y="${y + 15}" font-size="11" fill="#3c4a46">${esc(r.title.slice(0, 24))}</text>`
+    s += `<rect x="300" y="${y + 5}" width="${w}" height="14" rx="7" fill="${color}" opacity=".9"><title>${esc(r.title)}：真实得分 ${r.real.score}</title></rect>`
+    s += `<text x="${300 + w + 8}" y="${y + 16}" font-size="11" fill="#7a8783">${r.real.score}</text>`
+  })
+  $('#chartScore').innerHTML = svg(W, H, s)
+}
+
+function drawCtr() {
+  const all = filtered().filter(r => Number(r.exposure) > 0).map(r => ({ ...r, c: ctr(r) })).sort((a, b) => b.c - a.c)
+  if (!all.length) { $('#chartCtr').innerHTML = '<div class="empty">没有曝光数据</div>'; return }
+  const show = [...all.slice(0, 10), ...all.slice(-10)]
+  const max = Math.max(1, ...show.map(r => r.c))
+  const W = 980, rowH = 26, H = show.length * rowH + 26
+  let s = `<text x="0" y="12" font-size="11" fill="#7a8783">点击率 = 浏览 ÷ 曝光；上面 10 条是封面/标题转化好的，下面 10 条要改</text>`
+  show.forEach((r, i) => {
+    const y = 22 + i * rowH
+    const w = Math.max(3, (r.c / max) * 600)
+    const color = i < 10 ? '#17856d' : '#c9821b'
+    s += `<text x="0" y="${y + 13}" font-size="11" fill="#3c4a46">${esc(r.title.slice(0, 24))}</text>`
+    s += `<rect x="310" y="${y + 4}" width="${w}" height="12" rx="6" fill="${color}" opacity=".88"><title>${esc(r.title)}：${r.c.toFixed(1)}%</title></rect>`
+    s += `<text x="${310 + w + 8}" y="${y + 14}" font-size="11" fill="#7a8783">${r.c.toFixed(1)}%</text>`
+  })
+  $('#chartCtr').innerHTML = svg(W, H, s)
+}
+
+function drawScatter() {
+  const all = filtered().filter(r => Number(r.views) > 0)
+  if (!all.length) { $('#chartScatter').innerHTML = '<div class="empty">没有数据</div>'; return }
+  const W = 980, H = 340, L = 60, R = 20, T = 20, B = 46
+  const xs = all.map(r => Math.log10(Number(r.views) + 1))
+  const ys = all.map(r => rate(r, 'likes'))
+  const x0 = Math.min(...xs) - 0.05, x1 = Math.max(...xs) + 0.05
+  const y0 = 0, y1 = Math.max(5, Math.max(...ys) * 1.1)
+  const px = x => L + (x - x0) / (x1 - x0) * (W - L - R)
+  const py = y => H - B - (y - y0) / (y1 - y0) * (H - T - B)
+  let grid = ''
+  for (let i = 0; i <= 4; i++) {
+    const y = T + (H - T - B) * i / 4
+    grid += `<line x1="${L}" y1="${y}" x2="${W - R}" y2="${y}" stroke="rgba(22,33,30,.07)"/>
+      <text x="${L - 8}" y="${y + 4}" font-size="11" fill="#7a8783" text-anchor="end">${(y1 * (1 - i / 4)).toFixed(1)}%</text>`
+  }
+  const dots = all.map(r => `<circle cx="${px(Math.log10(Number(r.views) + 1)).toFixed(1)}" cy="${py(rate(r, 'likes')).toFixed(1)}" r="5" fill="#1a9c80" opacity=".65"><title>${esc(r.title)}｜浏览 ${fmt(r.views)}｜点赞率 ${rate(r, 'likes').toFixed(1)}%</title></circle>`).join('')
+  $('#chartScatter').innerHTML = svg(W, H, `${grid}
+    <text x="${L}" y="${H - 12}" font-size="11" fill="#7a8783">浏览（对数）→</text>
+    <text x="8" y="${T + 10}" font-size="11" fill="#7a8783">点赞率</text>${dots}`)
+}
+
+function renderTable() {
+  const base = filtered()
+  const all = state.rows.filter(inRange).map(r => ({ ...r, real: realScore(r, base) })).sort((a, b) => {
+    if (state.sortKey === 'score') return (a.real.score - b.real.score) * state.sortDir
+    const x = a[state.sortKey], y = b[state.sortKey]
+    if (typeof x === 'number' || typeof y === 'number') return (Number(x) - Number(y)) * state.sortDir
+    return String(x).localeCompare(String(y)) * state.sortDir
+  })
+  $('#tblHint').textContent = `共 ${all.length} 篇` + (state.exclude.size ? ` · 已排除 ${state.exclude.size} 篇` : '')
+  $('#table tbody').innerHTML = all.map(r => {
+    const off = state.exclude.has(Number(r.id))
+    return `<tr data-id="${r.id}" class="${state.selected === r.id ? 'active' : ''}${off ? ' off' : ''}">
+    <td class="num"><input type="checkbox" class="inc" data-id="${r.id}" ${off ? '' : 'checked'} title="不勾选就不计入统计"></td>
+    <td class="title" title="${esc(r.title)}">${esc(r.title)}</td>
+    <td class="num">${r.date}</td><td class="num">${fmt(r.views)}</td><td class="num">${fmt(r.likes)}</td>
+    <td class="num">${fmt(r.comments)}</td><td class="num">${fmt(r.favorites)}</td><td class="num">${fmt(r.shares)}</td>
+    <td class="num">${fmt(r.battery)}</td><td class="num">${fmt(r.exposure)}</td>
+    <td class="num">${r.real.score}</td></tr>`
+  }).join('')
+  $$('#table tbody tr').forEach(tr => tr.onclick = () => openPost(Number(tr.dataset.id)))
+  $$('#table tbody input.inc').forEach(box => {
+    box.onclick = ev => ev.stopPropagation()
+    box.onchange = () => {
+      const id = Number(box.dataset.id)
+      if (box.checked) state.exclude.delete(id)
+      else state.exclude.add(id)
+      void saveExclude()
+      renderCards(); renderRecent(); renderTodo()
+      drawMonth(); drawScore(); drawCtr(); drawScatter()
+      renderLists(); renderTable()
+      syncMeta()
+    }
+  })
+}
+
+function syncMeta() {
+  const el = $('#meta')
+  if (!el) return
+  el.textContent = el.textContent.replace(/ · 已排除 \d+ 篇不计入统计/g, '')
+  if (state.exclude.size) el.textContent += ` · 已排除 ${state.exclude.size} 篇不计入统计`
+}
+
+async function saveExclude() {
+  try {
+    await fetch('/api/exclude', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ ids: [...state.exclude] }),
+    })
+  } catch (e) { toast('排除设置没有保存成功：' + e.message) }
+}
+
+function renderLists() {
+  const all = scored()
+  const medExp = median(all.map(r => Number(r.exposure) || 0))
+  const lowCtr = all.filter(r => Number(r.exposure) >= medExp && ctr(r) < 15).sort((a, b) => ctr(a) - ctr(b))
+  const p75 = quantile(all.map(r => Number(r.views) || 0), 0.75)
+  const lowEng = all.filter(r => Number(r.views) >= p75 && (rate(r, 'likes') + rate(r, 'favorites') + rate(r, 'comments')) < 3)
+  const li = (r, m) => `<div class="item" data-id="${r.id}"><div class="t">${esc(r.title)}</div><div class="m">${m}</div></div>`
+  $('#listLowCtr').innerHTML = lowCtr.length ? lowCtr.map(r => li(r, `曝光 ${fmt(r.exposure)} · 点击率 ${ctr(r).toFixed(1)}%`)).join('') : '<div class="empty">没有</div>'
+  $('#listLowEngage').innerHTML = lowEng.length ? lowEng.map(r => li(r, `浏览 ${fmt(r.views)} · 互动率 ${(rate(r, 'likes') + rate(r, 'favorites') + rate(r, 'comments')).toFixed(1)}%`)).join('') : '<div class="empty">没有</div>'
+  $$('#listLowCtr .item, #listLowEngage .item').forEach(el => el.onclick = () => openPost(Number(el.dataset.id)))
+}
+
+function openPost(id) {
+  const all = scored()
+  const r = all.find(x => Number(x.id) === Number(id))
+  if (!r) return
+  state.selected = r.id
+  switchView('post')
+  const avg = k => all.reduce((a, x) => a + (Number(x[k]) || 0), 0) / Math.max(1, all.length)
+  const bar = (label, val, avgVal, color = '#17856d') => {
+    const max = Math.max(val, avgVal) * 1.15 || 1
+    return `<div class="barline"><span>${label}</span>
+      <div class="track"><i style="width:${(val / max * 100).toFixed(1)}%;background:${color}"></i></div>
+      <span style="color:#7a8783">${fmt(val)}</span></div>`
+  }
+  const p = r.real.parts
+  const part = (name, v, w) => `<div class="barline"><span>${name}</span><div class="track"><i style="width:${(v * 100).toFixed(1)}%;background:#2f6fb2"></i></div><span style="color:#7a8783">${Math.round(v * 100)}/100 · 权重 ${w}</span></div>`
+  const cmpBar = (label, val, avgVal, color = '#17856d') => {
+    const max = Math.max(val, avgVal) * 1.12 || 1
+    const ratio = avgVal ? val / avgVal : 0
+    const cls = ratio >= 1 ? 'up' : 'down'
+    const ratioText = ratio > 0 && ratio < 0.1 ? '<0.1×' : ratio.toFixed(1) + '×'
+    return `<div class="barline"><span>${label}</span>
+      <div class="track"><i style="width:${(val / max * 100).toFixed(1)}%;background:${color}"></i>
+      <b class="avgmark" style="left:${(avgVal / max * 100).toFixed(1)}%"></b></div>
+      <span class="cmpnum">${fmt(val)} / 均 ${Math.round(avgVal)} · <b class="${cls}">${ratioText}</b></span></div>`
+  }
+  $('#postDetail').innerHTML = `
+    <div class="panel">
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:baseline">
+        <h2 style="margin:0;font-size:17px;color:var(--ink)">${esc(r.title)}</h2>
+        <span class="hint">${r.date} · ${fmt(r.views)} 浏览</span>
+      </div>
+      <div class="row2" style="margin-top:16px">
+        <div style="flex:1;min-width:280px">
+          <div class="kv">
+            <span>浏览量</span><span>${fmt(r.views)}（账号均值 ${Math.round(avg('views'))}）</span>
+            <span>点赞 / 评论</span><span>${fmt(r.likes)} / ${fmt(r.comments)}</span>
+            <span>收藏 / 分享</span><span>${fmt(r.favorites)} / ${fmt(r.shares)}</span>
+            <span>充电</span><span>${fmt(r.battery)}</span>
+            <span>曝光</span><span>${fmt(r.exposure)}（点击率 ${ctr(r).toFixed(1)}%）</span>
+            <span>点赞率 / 收藏率</span><span>${rate(r, 'likes').toFixed(1)}% / ${rate(r, 'favorites').toFixed(1)}%</span>
+            <span>平台得分</span><span>${fmt(r.score)}</span>
+            <span>真实得分</span><span><b style="font-size:18px;color:var(--brand)">${r.real.score}</b> / 100</span>
+          </div>
+        </div>
+        <div style="flex:1;min-width:300px">
+          <div class="hint" style="margin-bottom:6px">真实得分的构成（相对账号内分位）</div>
+          ${part('浏览分位', p.pViews, '45%')}
+          ${part('点赞率分位', p.pLike, '20%')}
+          ${part('收藏率分位', p.pFav, '15%')}
+          ${part('评论率分位', p.pCom, '10%')}
+          ${part('充电率分位', p.pBat, '10%')}
+        </div>
+      </div>
+      <h2>这篇 vs 账号平均</h2>
+      <div class="hint" style="margin-bottom:8px">条形 = 这篇的数值；竖线 = 账号平均；右边的倍数 = 这篇 ÷ 平均。1.0× 表示刚好到平均，2.0× 就是平均的两倍。</div>
+      <div class="bars">
+        ${cmpBar('浏览', r.views, avg('views'))}
+        ${cmpBar('点赞', r.likes, avg('likes'), '#2f6fb2')}
+        ${cmpBar('评论', r.comments, avg('comments'), '#6e5aa0')}
+        ${cmpBar('收藏', r.favorites, avg('favorites'), '#c86e28')}
+        ${cmpBar('充电', r.battery, avg('battery'), '#c9821b')}
+      </div>
+      <h2>正文</h2>
+      <div class="panel" id="postBody" style="line-height:1.7;color:var(--ink)"></div>
+      <div class="hint">正文是按分享页的接口抓的，只用来做内容判断和预览，不进统计。</div>
+      <h2>两篇对比</h2>
+      <div class="row2" style="align-items:center">
+        <select id="cmpSel" style="max-width:520px"></select>
+        <span class="hint">选一篇，和当前这篇并排看</span>
+      </div>
+      <div id="cmpBox"></div>
+      <h2>这篇发布后 48 小时</h2>
+      <div class="panel chart" id="post48"></div>
+      <div class="hint">按抓取快照算：需要这篇发布后被至少抓过两次，才有两个点。</div>
+      <h2>这篇的每日浏览量</h2>
+      <div class="panel chart" id="postDaily"></div>
+      <div class="hint">每个点是一次抓取；横轴是抓取时间，越往右越新。</div>
+      <h2>浏览量预测</h2>
+      <div class="panel chart" id="postForecast"></div>
+      <div class="hint" id="forecastHint">按已抓到的曲线估「现在每天还能涨多少」，再按衰减推 14 天；这篇的互动率、曝光转化高于账号中位数会推快一点，低了就放慢。</div>
+      <div class="hint">平台给的「内容得分」只看平台自己的口径；真实得分是这篇在你自己账号里的相对位置：浏览 45%、点赞率 20%、收藏率 15%、评论率 10%、充电率 10%。</div>
+    </div>`
+  wireCompare(r)
+  void renderPost48(r)
+  void renderPostDaily(r)
+  void renderForecast(r)
+  void renderPostBody(r)
+}
+
+function wireCompare(cur) {
+  const sel = $('#cmpSel')
+  if (!sel) return
+  const others = filtered().filter(x => Number(x.id) !== Number(cur.id))
+  sel.innerHTML = '<option value="">选一篇对比…</option>' + others.map(x => `<option value="${x.id}">${esc(x.title.slice(0, 34))}</option>`).join('')
+  sel.onchange = () => {
+    const box = $('#cmpBox')
+    if (!sel.value) { box.innerHTML = ''; return }
+    const other = others.find(x => String(x.id) === sel.value)
+    if (!other) return
+    const rows = [
+      ['浏览', 'views'], ['点赞', 'likes'], ['评论', 'comments'], ['收藏', 'favorites'], ['分享', 'shares'], ['充电', 'battery'], ['曝光', 'exposure'],
+    ]
+    const diffCell = (a, b) => {
+      const d = (Number(b) || 0) - (Number(a) || 0)
+      const cls = d > 0 ? 'up' : d < 0 ? 'down' : ''
+      const sign = d > 0 ? '+' : ''
+      return `<td class="num"><b class="${cls}">${sign}${fmt(d)}</b></td>`
+    }
+    const otherScore = other.real?.score ?? realScore(other, filtered()).score
+    box.innerHTML = `<div class="hint" style="margin:6px 0 8px">差值 = 对比篇 − 这篇；正数表示对比篇更高。</div>
+      <table><thead><tr><th>指标</th><th class="num">这篇</th><th class="num">对比篇</th><th class="num">差值</th></tr></thead><tbody>
+      ${rows.map(([label, k]) => `<tr><td>${label}</td><td class="num">${fmt(cur[k])}</td><td class="num">${fmt(other[k])}</td>${diffCell(cur[k], other[k])}</tr>`).join('')}
+      <tr><td>真实得分</td><td class="num">${cur.real.score}</td><td class="num">${otherScore}</td>${diffCell(cur.real.score, otherScore)}</tr>
+    </tbody></table>`
+  }
+}
+
+function monthKey(d) { return String(d || '').slice(0, 7) }
+function thisMonth() { return new Date().toISOString().slice(0, 7) }
+
+function renderGoals() {
+  const posts = state.settings?.monthlyPosts || 20
+  const views = state.settings?.monthlyViews || 50000
+  const perViews = state.settings?.perPostViews || 1000
+  const perRate = Number(state.settings?.perPostRate ?? 3)
+  const perCount = Number(state.settings?.perPostCount) || 4
+  const mk = thisMonth()
+  const rows = state.rows.filter(r => monthKey(r.date) === mk && !state.exclude.has(Number(r.id)))
+  const pv = rows.reduce((a, r) => a + (Number(r.views) || 0), 0)
+  const line = (label, cur, target, unit, extra) => {
+    const pct = target > 0 ? Math.min(100, Math.round((cur / target) * 100)) : 0
+    return `<div class="goal"><div class="lab"><span>${label}${extra ? ` <span class="hint">${extra}</span>` : ''}</span><span>${fmt(cur)} / ${fmt(target)} ${unit}（${pct}%）</span></div>
+      <div class="bar"><i style="width:${pct}%"></i></div></div>`
+  }
+  const hitViews = rows.filter(r => (Number(r.views) || 0) >= perViews).length
+  const hitRate = rows.filter(r => (rate(r, 'likes') + rate(r, 'favorites') + rate(r, 'comments')) >= perRate).length
+  $('#goals').innerHTML = line('本月篇数', rows.length, posts, '篇') + line('本月浏览', pv, views, '次') +
+    line('单篇达标（浏览）', hitViews, perCount, '篇', `每篇 ≥ ${fmt(perViews)} 浏览`) +
+    line('单篇达标（互动）', hitRate, perCount, '篇', `每篇互动率 ≥ ${perRate}%`) +
+    `<div class="hint" style="margin-top:8px">按 ${mk} 的已发布内容算；取消「计入」的不算。单篇达标看本月有几篇达标，目标是每月 ${perCount} 篇。</div>`
+}
+
+function renderVsBest() {
+  const all = filtered()
+  if (!all.length) { $('#vsBest').innerHTML = '<div class="empty">没有数据</div>'; return }
+  const best = [...all].sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0))[0]
+  const last10 = [...all].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 10)
+  const avg10 = Math.round(last10.reduce((a, r) => a + (Number(r.views) || 0), 0) / Math.max(1, last10.length))
+  const bestAvg = Math.round(all.reduce((a, r) => a + (Number(r.views) || 0), 0) / all.length)
+  $('#vsBest').innerHTML = `
+    <div class="box"><div class="hint">历史最好</div><b>${fmt(best.views)}</b><div class="hint" style="margin-top:6px">${esc(best.title.slice(0, 26))}</div></div>
+    <div class="box"><div class="hint">最近 10 篇平均</div><b>${fmt(avg10)}</b><div class="hint" style="margin-top:6px">全账号平均 ${fmt(bestAvg)}</div></div>`
+}
+
+function drawHeatmap() {
+  const counts = new Map()
+  for (const r of state.rows) if (r.date) counts.set(r.date, (counts.get(r.date) || 0) + 1)
+  const today = new Date()
+  const list = []
+  let max = 1
+  for (let i = 139; i >= 0; i--) {
+    const d = new Date(today.getTime() - i * 86400000)
+    const key = d.toISOString().slice(0, 10)
+    const n = counts.get(key) || 0
+    max = Math.max(max, n)
+    list.push({ key, n })
+  }
+  $('#heatmap').innerHTML = list.map(({ key, n }) => {
+    const a = n ? (0.2 + 0.7 * (n / max)).toFixed(2) : 0
+    return `<i data-tip="${key}：${n} 篇" style="background:${n ? `rgba(23,133,109,${a})` : '#efeae1'}"></i>`
+  }).join('')
+  const total = list.reduce((a, x) => a + x.n, 0)
+  $('#heatHint').textContent = `最近 140 天发了 ${total} 篇；颜色越深，当天发得越多。`
+}
+
+async function renderPost48(post) {
+  const box = $('#post48')
+  if (!box) return
+  let hist = []
+  try { hist = await (await fetch('/api/history')).json() } catch {}
+  const pub = new Date(post.date + 'T12:00:00').getTime()
+  const pts = []
+  for (const snap of hist) {
+    const row = (snap.rows || []).find(x => Number(x.id) === Number(post.id))
+    if (!row) continue
+    const t = new Date(snap.at || snap.day + 'T23:59:59').getTime()
+    const h = Math.round((t - pub) / 3600000)
+    if (h >= 0 && h <= 96) pts.push({ h, v: Number(row.views) || 0 })
+  }
+  if (pts.length < 2) {
+    box.innerHTML = `<div class="empty">这篇还只有 ${pts.length} 个快照点，攒到 2 个以上才能画曲线</div>
+      <div class="hint" style="margin-top:8px">发布于 ${post.date}，当前 ${fmt(post.views)} 浏览。每天 18:00 自动抓一次，攒两天以上才有曲线。</div>`
+    return
+  }
+  const W = 900, H = 260, pad = 40
+  const maxH = Math.max(...pts.map(p => p.h), 48)
+  const maxV = Math.max(...pts.map(p => p.v), 1)
+  const X = h => pad + (h / maxH) * (W - pad * 2)
+  const Y = v => H - pad - (v / maxV) * (H - pad * 2)
+  const path = pts.map((p, i) => `${i ? 'L' : 'M'}${X(p.h).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+  box.innerHTML = svg(W, H, `
+    <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <path d="${path}" fill="none" stroke="#17856d" stroke-width="2.5"/>
+    ${pts.map(p => `<circle cx="${X(p.h)}" cy="${Y(p.v)}" r="4" fill="#17856d" data-tip="${p.h} 小时 · ${fmt(p.v)} 浏览"/>`).join('')}
+    <text x="${pad}" y="${H - 12}" font-size="11" fill="#8c8478">发布后小时</text>
+    <text x="${pad}" y="${pad - 12}" font-size="11" fill="#8c8478">浏览</text>`)
+}
+
+async function loadHist() {
+  try { return await (await fetch('/api/history')).json() } catch { return [] }
+}
+
+function histTime(s) { return new Date(s.at || (s.day + 'T23:59:59')).getTime() }
+
+async function drawDaily() {
+  const box = $('#chartDaily')
+  if (!box) return
+  const hist = await loadHist()
+  // 每天取最后一次快照的合计，再算「今天 − 昨天」= 当天新增
+  const byDay = new Map()
+  for (const s of hist) {
+    const rows = s.rows || []
+    if (!rows.length) continue
+    let v = 0
+    for (const x of rows) if (!state.exclude.has(Number(x.id))) v += Number(x.views) || 0
+    const day = s.day || new Date(s.at).toISOString().slice(0, 10)
+    byDay.set(day, v)
+  }
+  const days = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  const pts = []
+  for (let i = 1; i < days.length; i++) pts.push({ day: days[i][0], v: Math.max(0, days[i][1] - days[i - 1][1]) })
+  if (!pts.length) {
+    box.innerHTML = `<div class="empty">要有两天的快照才能算「每天新增」。现在只有 ${days.length} 天，明天 18:00 抓完就有第一个点。</div>`
+    return
+  }
+  const W = 1000, H = 300, pad = 54
+  const maxV = Math.max(...pts.map(p => p.v), 1)
+  const X = i => pts.length === 1 ? W / 2 : pad + (i / (pts.length - 1)) * (W - pad * 2)
+  const Y = v => H - pad - (v / maxV) * (H - pad * 2)
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+  const dots = pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="4" fill="#17856d" data-tip="${p.day}｜新增 ${fmt(p.v)} 浏览"/>`).join('')
+  const last = pts[pts.length - 1]
+  box.innerHTML = `<div class="legend"><span><i style="background:#17856d;border-radius:50%"></i>每天新增浏览（当天最后一次 − 前一天最后一次）</span></div>` + svg(W, H, `
+    <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <path d="${d}" fill="none" stroke="#17856d" stroke-width="2.5" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${pad}" y="${H - 18}" font-size="11" fill="#8c8478">${pts[0].day.slice(5)}</text>
+    <text x="${W - pad}" y="${H - 18}" font-size="11" fill="#8c8478" text-anchor="end">${last.day.slice(5)}</text>
+    <text x="${pad}" y="${pad - 14}" font-size="11" fill="#8c8478">新增浏览</text>`) +
+    `<div class="hint">最近一天 ${last.day}：新增 ${fmt(last.v)} 浏览；共 ${days.length} 天快照、${pts.length} 个新增点。</div>`
+}
+
+async function renderPostDaily(post) {
+  const box = $('#postDaily')
+  if (!box) return
+  const hist = await loadHist()
+  const byDay = new Map()
+  for (const s of hist) {
+    const row = (s.rows || []).find(x => Number(x.id) === Number(post.id))
+    if (!row) continue
+    const day = s.day || new Date(s.at).toISOString().slice(0, 10)
+    byDay.set(day, Number(row.views) || 0)
+  }
+  const days = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+  const pts = []
+  for (let i = 1; i < days.length; i++) pts.push({ day: days[i][0], v: Math.max(0, days[i][1] - days[i - 1][1]) })
+  if (!pts.length) {
+    box.innerHTML = `<div class="empty">要有两天的快照才能算这篇的每天新增。现在只有 ${days.length} 天。</div>`
+    return
+  }
+  const W = 1000, H = 280, pad = 54
+  const maxV = Math.max(...pts.map(p => p.v), 1)
+  const X = i => pts.length === 1 ? W / 2 : pad + (i / (pts.length - 1)) * (W - pad * 2)
+  const Y = v => H - pad - (v / maxV) * (H - pad * 2)
+  const d = pts.map((p, i) => `${i ? 'L' : 'M'}${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+  const dots = pts.map((p, i) => `<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="4" fill="#0f5e4e" data-tip="${p.day}｜新增 ${fmt(p.v)} 浏览"/>`).join('')
+  const last = pts[pts.length - 1]
+  box.innerHTML = `<div class="legend"><span><i style="background:#0f5e4e;border-radius:50%"></i>这篇每天新增浏览（当天最后一次 − 前一天最后一次）</span></div>` + svg(W, H, `
+    <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <path d="${d}" fill="none" stroke="#0f5e4e" stroke-width="2.5" stroke-linejoin="round"/>
+    ${dots}
+    <text x="${pad}" y="${H - 18}" font-size="11" fill="#8c8478">${pts[0].day.slice(5)}</text>
+    <text x="${W - pad}" y="${H - 18}" font-size="11" fill="#8c8478" text-anchor="end">${last.day.slice(5)}</text>
+    <text x="${pad}" y="${pad - 14}" font-size="11" fill="#8c8478">新增浏览</text>`) +
+    `<div class="hint">最近一天 ${last.day}：这篇新增 ${fmt(last.v)} 浏览；共 ${days.length} 天快照、${pts.length} 个新增点。</div>`
+}
+
+async function renderPostBody(post) {
+  const box = $('#postBody')
+  if (!box) return
+  let b = null
+  try { b = await (await fetch('/api/body?id=' + encodeURIComponent(post.id))).json() } catch {}
+  if (!b || !b.ok) {
+    box.innerHTML = `<div class="empty">这篇的正文还没抓到，下次抓取时会补；现在预测只用统计和互动。</div>`
+    return
+  }
+  const text = String(b.text || '')
+  const head = text.slice(0, 260)
+  box.innerHTML = `<div style="white-space:pre-wrap">${esc(head)}${text.length > 260 ? '…' : ''}</div>` +
+    `<div class="hint" style="margin-top:8px">共 ${fmt(text.length)} 字 · 标题：${esc(b.title || '')}</div>`
+}
+
+async function renderForecast(post) {
+  const box = $('#postForecast')
+  if (!box) return
+  let f = null
+  try { f = await (await fetch('/api/forecast?id=' + encodeURIComponent(post.id) + '&days=14')).json() } catch {}
+  if (!f || !f.ok) {
+    box.innerHTML = `<div class="empty">${esc(f?.error || '预测失败，可能是抓取历史还不够')}</div>`
+    return
+  }
+  const act = f.actual || [], pred = f.predicted || []
+  if (!act.length || !pred.length) {
+    box.innerHTML = `<div class="empty">历史点不够，先攒两次抓取</div>`
+    return
+  }
+  const W = 1000, H = 300, pad = 54
+  const maxD = Math.max(act[act.length - 1].d, pred[pred.length - 1].d, 1)
+  const maxV = Math.max(...act.map(p => p.v), ...pred.map(p => p.v), 1)
+  const X = d => pad + (d / Math.max(1, maxD)) * (W - pad * 2)
+  const Y = v => H - pad - (v / maxV) * (H - pad * 2)
+  const actPath = act.map((p, i) => `${i ? 'L' : 'M'}${X(p.d).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+  const predPath = [act[act.length - 1], ...pred].map((p, i) => `${i ? 'L' : 'M'}${X(p.d).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ')
+  const dots = act.map(p => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="3.5" fill="#0f5e4e" data-tip="发布后 ${p.d} 天（${p.day}）｜${fmt(p.v)} 浏览"/>`).join('')
+  const pdots = pred.map(p => `<circle cx="${X(p.d).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="3" fill="none" stroke="#c9821b" stroke-width="1.5" data-tip="预测发布后 ${p.d} 天｜${fmt(p.v)} 浏览"/>`).join('')
+  const p = f.params || {}
+  const d7 = pred[Math.min(6, pred.length - 1)]
+  const d14 = pred[pred.length - 1]
+  const lastActual = act[act.length - 1].v
+  const calibTxt = (p.mape != null && p.calibSamples > 0)
+    ? `自检：${p.calibSource === 'backtest' ? '用历史点回测' : '回看已发生的预测'} ${p.calibSamples} 次，平均误差 ${p.mape}%，全站校正 ×${p.calibGlobal}${p.calibPost !== 1 ? '、这篇 ×' + p.calibPost : ''}。`
+    : '自检：还没攒够可回看的点，先按默认系数算。'
+  box.innerHTML = `<div class="legend"><span><i style="background:#0f5e4e;border-radius:50%"></i>实际</span><span><i style="background:#c9821b;border-radius:50%"></i>预测</span></div>` + svg(W, H, `
+    <line x1="${pad}" y1="${H - pad}" x2="${W - pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <line x1="${pad}" y1="${pad}" x2="${pad}" y2="${H - pad}" stroke="#dcd5c9"/>
+    <path d="${actPath}" fill="none" stroke="#0f5e4e" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="${predPath}" fill="none" stroke="#c9821b" stroke-width="2.5" stroke-dasharray="7 6" stroke-linejoin="round"/>
+    ${dots}${pdots}
+    <text x="${pad}" y="${H - 18}" font-size="11" fill="#8c8478">发布当天</text>
+    <text x="${W - pad}" y="${H - 18}" font-size="11" fill="#8c8478" text-anchor="end">第 ${Math.round(maxD)} 天</text>
+    <text x="${pad}" y="${pad - 14}" font-size="11" fill="#8c8478">浏览</text>`) +
+    `<div class="hint">现在约每天 +${fmt(p.dailyNow || 0)}；7 天后约 ${fmt(d7.v)}，14 天后约 ${fmt(d14.v)}（当前 ${fmt(lastActual)}）。</div>` +
+    `<div class="hint">依据：最近 ${p.spanH} 小时涨 ${fmt(p.lastInc || 0)}（合每小时 ${p.hourly}）；衰减 ${p.tauH} 小时；内容系数 ${p.contentFactor}（互动率分位 ${p.engagementPct}%，摘要 ${p.descLen} 字、配图 ${p.imgCount} 张）。</div>` +
+    `<div class="hint">${calibTxt}越往后误差越大，只当趋势看。</div>`
+}
+
+function switchView(v) {
+  state.view = v
+  $$('.tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.v === v)))
+  for (const name of ['overview', 'charts', 'content', 'post', 'settings']) $(`#view-${name}`).hidden = name !== v
+  if (v === 'overview') { renderCards(); renderGoals(); renderVsBest(); renderRecent(); renderTodo() }
+  if (v === 'charts') { drawDaily(); drawMonth(); drawScore(); drawCtr(); drawScatter(); drawHeatmap() }
+  if (v === 'content') { renderLists(); renderTable() }
+}
+
+async function load() {
+  const res = await fetch('/api/data')
+  const data = await res.json()
+  state.rows = (data.rows || []).filter(r => r.title)
+  state.running = !!data.running
+  try {
+    const ex = await (await fetch('/api/exclude')).json()
+    state.exclude = new Set((ex.ids || []).map(Number))
+  } catch { state.exclude = new Set() }
+  const t = data.updatedAt ? new Date(data.updatedAt).toLocaleString('zh-CN') : '未知'
+  const sch = data.schedule
+  const schText = sch?.at
+    ? ` · 上次自动抓取 ${new Date(sch.at).toLocaleString('zh-CN', { hour12: false }).slice(5)} ${sch.ok ? '成功' : '失败' + (sch.error ? '（' + sch.error + '）' : '')}`
+    : ''
+  $('#meta').textContent = `共 ${state.rows.length} 篇 · 数据时间 ${t}` + (data.auto?.autoScrape ? ` · 每天 ${String(data.auto.dailyHour ?? 18).padStart(2, '0')}:00 自动抓一次` : '') + schText + (state.exclude.size ? ` · 已排除 ${state.exclude.size} 篇不计入统计` : '')
+  // 30 天环比：以数据里最新的发布日期为基准
+  const dates = state.rows.map(r => r.date).filter(Boolean).sort()
+  const ref = dates.length ? new Date(dates[dates.length - 1]) : new Date()
+  const day = 86400000
+  const win = (from, to) => state.rows.filter(r => {
+    const d = new Date(r.date)
+    return d >= new Date(ref - from * day) && d < new Date(ref - to * day)
+  })
+  const a = win(30, 0), b = win(60, 30)
+  const sv = arr => arr.reduce((s, r) => s + (Number(r.views) || 0), 0)
+  const pct = (cur, prev) => prev ? Math.round(((cur - prev) / prev) * 100) : null
+  const pv = pct(sv(a), sv(b))
+  $('#cmp').textContent = `近 30 天 ${a.length} 篇 / ${sv(a).toLocaleString()} 浏览；前 30 天 ${b.length} 篇 / ${sv(b).toLocaleString()} 浏览` + (pv === null ? '（之前没有数据，环比算不出）' : `（浏览 ${pv >= 0 ? '+' : ''}${pv}%）`)
+  switchView(state.view)
+}
+
+async function loadSettings() {
+  const s = await (await fetch('/api/settings')).json()
+  state.settings = s
+  $('#apiKey').value = ''
+  $('#apiKey').placeholder = s.hasKey ? `已保存：${s.apiKey}（留空不改）` : '还没填'
+  $('#model').value = s.model || 'deepseek-flash'
+  $('#autoScrape').checked = !!s.autoScrape
+  $('#dailyHour').value = s.dailyHour ?? 18
+  $('#goalPosts').value = s.monthlyPosts || 20
+  $('#goalViews').value = s.monthlyViews || 50000
+  $('#goalPerViews').value = s.perPostViews || 1000
+  $('#goalPerRate').value = s.perPostRate ?? 3
+  $('#goalPerCount').value = s.perPostCount || 4
+}
+
+$$('.tab').forEach(t => t.onclick = () => switchView(t.dataset.v))
+
+// 悬停提示：所有带 data-tip 的元素（图表点、热力图格子）共用一个小浮层
+document.addEventListener('mousemove', ev => {
+  const tip = $('#tip')
+  const el = ev.target.closest?.('[data-tip]')
+  if (!el) { tip.classList.remove('show'); return }
+  tip.textContent = el.getAttribute('data-tip')
+  tip.style.left = Math.min(ev.clientX + 14, innerWidth - 280) + 'px'
+  tip.style.top = (ev.clientY + 16) + 'px'
+  tip.classList.add('show')
+})
+document.addEventListener('mouseleave', () => $('#tip').classList.remove('show'))
+$$('#range button').forEach(b => b.onclick = () => {
+  $$('#range button').forEach(x => x.setAttribute('aria-pressed', 'false'))
+  b.setAttribute('aria-pressed', 'true')
+  state.days = Number(b.dataset.d)
+  switchView(state.view)
+})
+$$('th[data-k]').forEach(th => th.onclick = () => {
+  const k = th.dataset.k
+  if (state.sortKey === k) state.sortDir *= -1
+  else { state.sortKey = k; state.sortDir = (k === 'title' || k === 'date') ? 1 : -1 }
+  renderTable()
+})
+
+$('#btnScrape').onclick = async () => {
+  const b = $('#btnScrape'); b.disabled = true; b.textContent = '抓取中…'
+  try {
+    const r = await (await fetch('/api/scrape', { method: 'POST' })).json()
+    if (!r.ok) throw new Error(r.error)
+    toast(`抓取完成：${r.count} 篇，用时 ${(r.ms / 1000).toFixed(0)} 秒`)
+    await load()
+  } catch (e) { toast('抓取失败：' + e.message) }
+  b.disabled = false; b.textContent = '重新抓取'
+}
+
+$('#btnSave').onclick = async () => {
+  const body = {
+    model: $('#model').value,
+    autoScrape: $('#autoScrape').checked,
+    dailyHour: Number($('#dailyHour').value) || 0,
+    monthlyPosts: Number($('#goalPosts').value) || 20,
+    monthlyViews: Number($('#goalViews').value) || 50000,
+    perPostViews: Number($('#goalPerViews').value) || 1000,
+    perPostRate: Number($('#goalPerRate').value) || 0,
+    perPostCount: Number($('#goalPerCount').value) || 4,
+  }
+  const key = $('#apiKey').value.trim()
+  if (key) body.apiKey = key
+  const r = await (await fetch('/api/settings', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })).json()
+  $('#saveHint').textContent = r.ok ? '已保存（定时设置要重启服务才生效）' : '保存失败'
+  if (r.ok) { $('#apiKey').value = ''; toast('设置已保存') }
+}
+
+async function analyze(mode) {
+  const b = mode === 'prompt' ? $('#btnPrompt') : $('#btnAnalyze')
+  b.disabled = true; const old = b.textContent; b.textContent = '生成中…'
+  try {
+    const r = await (await fetch('/api/analyze', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ mode }) })).json()
+    if (!r.ok) throw new Error(r.error)
+    const text = mode === 'prompt' ? r.prompt : (r.report || r.prompt)
+    $('#out').style.display = 'block'; $('#out').textContent = text || r.log || '没有内容'
+    toast(mode === 'prompt' ? '提示词已生成' : (r.report ? '报告已生成' : '没填 API Key，显示的是提示词'))
+  } catch (e) { toast('失败：' + e.message) }
+  b.disabled = false; b.textContent = old
+}
+$('#btnAnalyze').onclick = () => analyze('report')
+$('#btnPrompt').onclick = () => analyze('prompt')
+
+
+// 数字滚动 + 卡片聚光
+function tickIn(root) {
+  const scope = root || document
+  scope.querySelectorAll('.card b[data-v]').forEach(el => {
+    const target = Number(el.dataset.v) || 0
+  if (navigator.webdriver) { el.textContent = fmt(target); return }
+    const dur = 720, t0 = performance.now()
+    const step = now => {
+      const p = Math.min(1, (now - t0) / dur)
+      const e = 1 - Math.pow(1 - p, 3)
+      el.textContent = fmt(Math.round(target * e))
+      if (p < 1) requestAnimationFrame(step)
+    }
+    requestAnimationFrame(step)
+  })
+}
+document.addEventListener('mousemove', e => {
+  const c = e.target.closest && e.target.closest('.card,.panel')
+  if (!c) return
+  const r = c.getBoundingClientRect()
+  c.style.setProperty('--mx', (e.clientX - r.left) + 'px')
+  c.style.setProperty('--my', (e.clientY - r.top) + 'px')
+})
+
+load().then(() => {
+  const hv = (location.hash || '').replace('#', '')
+  if (['overview', 'charts', 'content', 'settings'].includes(hv)) switchView(hv)
+  if (hv.startsWith('post=')) {
+    const id = Number(hv.slice(5))
+    if (state.rows.some(r => Number(r.id) === id)) openPost(id)
+  }
+}).catch(e => toast('读取失败：' + e.message))
+loadSettings().catch(() => {})
+</script>
+</body>
+</html>

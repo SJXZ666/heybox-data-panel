@@ -1,0 +1,35 @@
+node_modules/
+web/node_modules/
+web/dist/
+
+# 本地数据（含账号信息，绝不提交）
+data.json
+data.csv
+history.json
+bodies.json
+exclude.json
+config.json
+schedule.json
+analysis.json
+predictions.json
+calibration.json
+accounts/
+accounts.json
+edge-profile/
+edge-profile-*/
+*.log
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# 截图与临时产物
+截图/
+screenshots/
+*.tmp
+
+# 含个人账号数据的分析结果
+分析报告.md
+分析提示词.md
